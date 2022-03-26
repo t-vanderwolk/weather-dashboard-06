@@ -3,8 +3,5 @@ let apiURL = "https://api.openweathermap.org/data/2.5/onecall?lat=33.49&lon=111.
 .then(function (response) {
           if (response.ok) {
             response.json().then(function (data) {
-              displayIssues(data)
-            }
-            )
-        }
-};
+              displayIssues(data);     
+
