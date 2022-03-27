@@ -1,7 +1,7 @@
 function getApi() {
     
-    let requestUrl ="https://api.openweathermap.org/data/2.5/weather?q={city name}&appid={API key}"
-    let APIKey=" 44e2b3699341d2a3a6d507833c150d02";
+    let requestUrl ="http://api.openweathermap.org/geo/1.0/reverse?lat=&lon=&appid=44e2b3699341d2a3a6d507833c150d02";
+    
   
     fetch(requestUrl)
       .then(function (response) {
@@ -14,11 +14,11 @@ function getApi() {
           repoList.appendChild(listItem);
         }
       });
-  }
   
-  fetchButton.addEventListener('click', getApi());
+ 
+document.addEventListener('click', getApi);
 let city="";
-// letiable declarations
+
 let searchCity = $("#search-city");
 let searchButton = $("#search-button");
 let clearButton = $("#clear-history");
@@ -38,15 +38,14 @@ function find(c){
     return 1;
 
 }
-
-//function getApi(){
-
-// let requestURL = "https://api.openweathermap.org/data/2.5/onecall?lat=33.49&lon=111.926109&exclude=hourly,daily&appid=44e2b3699341d2a3a6d507833c150d02";
-// fetch(requestURL)
-// .then(function (response) {
-//   return response.json();
-// })
-// .then(function (data) {
-//   console.log(data)
-// })
-// }
+//Set up the API key
+let APIKey="44e2b3699341d2a3a6d507833c150d02";
+// Display the curent and future weather to the user after grabing the city form the input text box.
+function displayWeather(event){
+    event.preventDefault();
+    if(searchCity.val().trim()!==""){
+        city=searchCity.val().trim();
+        currentWeather(city);
+    }
+}
+}
