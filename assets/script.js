@@ -1,51 +1,197 @@
-function getApi() {
-    
-    let requestUrl ="http://api.openweathermap.org/geo/1.0/reverse?lat=&lon=&appid=44e2b3699341d2a3a6d507833c150d02";
-    
+
+   
+function createCityList(citySearchList) {
+    $("#city-list").empty();
   
-    fetch(requestUrl)
-      .then(function (response) {
-        return response.json();
-      })
-      .then(function (data) {
-        for (let i = 0; i < data.length; i++) {
-          let listItem = document.createElement('li');
-          listItem.textContent = data[i].html_url;
-          repoList.appendChild(listItem);
-        }
+    let keys = Object.keys(citySearchList);
+    for (let i = 0; i < keys.length; i++) {
+      let cityListEntry = $("<button>");
+      cityListEntry.addClass("list-group-item list-group-item-action");
+  
+      let splitStr = keys[i].toLowerCase().split(" ");
+      for (let j = 0; j < splitStr.length; j++) {
+        splitStr[j] =
+          splitStr[j].charAt(0).toUpperCase() + splitStr[j].substring(1);
+      }
+      let titleCasedCity = splitStr.join(" ");
+      cityListEntry.text(titleCasedCity);
+  
+      $("#city-list").append(cityListEntry);
+    }
+  }
+  
+  function populateCityWeather(city, citySearchList) {
+    createCityList(citySearchList);
+  
+    let queryURL =
+      "https://api.openweathermap.org/data/2.5/weather?&units=imperial&appid=885e9149105e8901c9809ac018ce8658&q=" +
+      city;
+  
+    let queryURL2 =
+      "https://api.openweathermap.org/data/2.5/forecast?&units=imperial&appid=885e9149105e8901c9809ac018ce8658&q=" +
+      city;
+  
+    let latitude;  //                                                         5ec7d1bb3ca63f903a8ab7589a3c860e
+
+  
+    let longitude;
+  
+    $.ajax({
+      url: queryURL,
+      method: "GET"
+    })
+      // Store all of the retrieved data inside of an object called "weather"
+      .then(function(weather) {
+        // Log the queryURL
+        console.log(queryURL);
+  
+        // Log the resulting object
+        console.log(weather);
+  
+        let nowMoment = moment();
+  
+        let displayMoment = $("<h3>");
+        $("#city-name").empty();
+        $("#city-name").append(
+          displayMoment.text("(" + nowMoment.format("M/D/YYYY") + ")")
+        );
+  
+        let cityName = $("<h3>").text(weather.name);
+        $("#city-name").prepend(cityName);
+  
+        let weatherIcon = $("<img>");
+        weatherIcon.attr(
+          "src",
+          "https://openweathermap.org/img/w/" + weather.weather[0].icon + ".png"
+        );
+        $("#current-icon").empty();
+        $("#current-icon").append(weatherIcon);
+  
+        $("#current-temp").text("Temperature: " + weather.main.temp + " °F");
+        $("#current-humidity").text("Humidity: " + weather.main.humidity + "%");
+        $("#current-wind").text("Wind Speed: " + weather.wind.speed + " MPH");
+  
+        latitude = weather.coord.lat;
+        longitude = weather.coord.lon;
+  
+        let queryURL3 =
+          "https://api.openweathermap.org/data/2.5/uvi/forecast?&units=imperial&appid=885e9149105e8901c9809ac018ce8658&q=" +
+          "&lat=" +
+          latitude +
+          "&lon=" +
+          longitude;
+  
+        $.ajax({
+          url: queryURL3,
+          method: "GET"
+          // Store all of the retrieved data inside of an object called "uvIndex"
+        }).then(function(uvIndex) {
+          console.log(uvIndex);
+  
+          let uvIndexDisplay = $("<button>");
+          uvIndexDisplay.addClass("btn btn-danger");
+  
+          $("#current-uv").text("UV Index: ");
+          $("#current-uv").append(uvIndexDisplay.text(uvIndex[0].value));
+          console.log(uvIndex[0].value);
+  
+          $.ajax({
+            url: queryURL2,
+            method: "GET"
+            // Store all of the retrieved data inside of an object called "forecast"
+          }).then(function(forecast) {
+            console.log(queryURL2);
+  
+            console.log(forecast);
+            // Loop through the forecast list array and display a single forecast entry/time (5th entry of each day which is close to the highest temp/time of the day) from each of the 5 days
+            for (let i = 6; i < forecast.list.length; i += 8) {
+              // 6, 14, 22, 30, 38
+              let forecastDate = $("<h5>");
+  
+              let forecastPosition = (i + 2) / 8;
+  
+              console.log("#forecast-date" + forecastPosition);
+             //nowMoment
+              $("#forecast-date" + forecastPosition).empty();
+              $("#forecast-date" + forecastPosition).append(
+                forecastDate.text(nowMoment.add(1, "days").format("M/D/YYYY"))
+              );
+  
+              let forecastIcon = $("<img>");
+              forecastIcon.attr(
+                "src",
+                "https://openweathermap.org/img/w/" +
+                  forecast.list[i].weather[0].icon +
+                  ".png"
+              );
+  
+              $("#forecast-icon" + forecastPosition).empty();
+              $("#forecast-icon" + forecastPosition).append(forecastIcon);
+  
+              console.log(forecast.list[i].weather[0].icon);
+  
+              $("#forecast-temp" + forecastPosition).text(
+                "Temp: " + forecast.list[i].main.temp + " °F"
+              );
+              $("#forecast-humidity" + forecastPosition).text(
+                "Humidity: " + forecast.list[i].main.humidity + "%"
+              );
+  
+            //   $(".forecast").attr(
+            //     "style",
+            //     "width:15%; height:20%; display:inline-block;"
+              ;
+            }
+          });
+        });
       });
+  }
   
- 
-document.addEventListener('click', getApi);
-let city="";
-
-let searchCity = $("#search-city");
-let searchButton = $("#search-button");
-let clearButton = $("#clear-history");
-let currentCity = $("#current-city");
-let currentTemperature = $("#temperature");
-let currentHumidty= $("#humidity");
-let currentWSpeed=$("#wind-speed");
-let currentUvindex= $("#uv-index");
-let sCity=[];
-// searches the city to see if it exists in the entries from the local storage
-function find(c){
-    for (let i=0; i<sCity.length; i++){
-        if(c.toUpperCase()===sCity[i]){
-            return -1;
-        }
+  $(document).ready(function() {
+    let citySearchListStringified = localStorage.getItem("citySearchList");
+  
+    let citySearchList = JSON.parse(citySearchListStringified);
+  
+    if (citySearchList == null) {
+      citySearchList = {};
     }
-    return 1;
-
-}
-//Set up the API key
-let APIKey="44e2b3699341d2a3a6d507833c150d02";
-// Display the curent and future weather to the user after grabing the city form the input text box.
-function displayWeather(event){
-    event.preventDefault();
-    if(searchCity.val().trim()!==""){
-        city=searchCity.val().trim();
-        currentWeather(city);
-    }
-}
-}
+  
+    createCityList(citySearchList);
+  
+    $("#current-weather").hide();
+    $("#forecast-weather").hide();
+  
+  
+  
+    $("#search-button").on("click", function(event) {
+      event.preventDefault();
+      let city = $("#city-input")
+        .val()
+        .trim()
+        .toLowerCase();
+  
+      if (city != "") {
+        //Check to see if there is any text entered
+      
+        citySearchList[city] = true;
+      localStorage.setItem("citySearchList", JSON.stringify(citySearchList));
+  
+      populateCityWeather(city, citySearchList);
+  
+      $("#current-weather").show();
+      $("#forecast-weather").show();
+      }
+  
+      
+    });
+  
+    $("#city-list").on("click", "button", function(event) {
+      event.preventDefault();
+      let city = $(this).text();
+  
+      populateCityWeather(city, citySearchList);
+  
+      $("#current-weather").show();
+      $("#forecast-weather").show();
+    });
+  });
