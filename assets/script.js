@@ -24,14 +24,14 @@ function createCityList(citySearchList) {
     createCityList(citySearchList);
   
     let queryURL =
-      "https://api.openweathermap.org/data/2.5/weather?&units=imperial&appid=885e9149105e8901c9809ac018ce8658&q=" +
+      "https://api.openweathermap.org/data/2.5/weather?&units=imperial&appid=5ec7d1bb3ca63f903a8ab7589a3c860e&q=" +
       city;
   
     let queryURL2 =
-      "https://api.openweathermap.org/data/2.5/forecast?&units=imperial&appid=885e9149105e8901c9809ac018ce8658&q=" +
+      "https://api.openweathermap.org/data/2.5/forecast?&units=imperial&appid=5ec7d1bb3ca63f903a8ab7589a3c860e&q=" +
       city;
   
-    let latitude;  //                                                         5ec7d1bb3ca63f903a8ab7589a3c860e
+    let latitude;  //                                                         
 
   
     let longitude;
@@ -75,7 +75,7 @@ function createCityList(citySearchList) {
         longitude = weather.coord.lon;
   
         let queryURL3 =
-          "https://api.openweathermap.org/data/2.5/uvi/forecast?&units=imperial&appid=885e9149105e8901c9809ac018ce8658&q=" +
+          "https://api.openweathermap.org/data/2.5/uvi/forecast?&units=imperial&appid=5ec7d1bb3ca63f903a8ab7589a3c860e&q=" +
           "&lat=" +
           latitude +
           "&lon=" +
@@ -157,6 +157,7 @@ function createCityList(citySearchList) {
     }
   
     createCityList(citySearchList);
+    
   
     $("#current-weather").hide();
     $("#forecast-weather").hide();
